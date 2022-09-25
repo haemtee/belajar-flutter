@@ -70,91 +70,98 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Demo API'),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text((postResult) != null
-                  ? "${postResult?.id} | ${postResult?.name} | ${postResult?.job} | ${postResult?.created}"
-                  : "Tidak ada data"),
-              Text((userGet) != null
-                  ? "${userGet?.id} | ${userGet?.name}"
-                  : "Tidak ada data"),
-              SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: (userGet != null)
-                      ? CircleAvatar(
-                          backgroundImage: NetworkImage(userGet!.avatar))
-                      : null),
-              Card(
-                child: SizedBox(
-                    width: 250,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: TextFormField(
-                            controller: nameController,
-                            decoration:
-                                (const InputDecoration(labelText: 'Nama')),
+        body: ListView(children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text((postResult) != null
+                    ? "${postResult?.id} | ${postResult?.name} | ${postResult?.job} | ${postResult?.created}"
+                    : "Tidak ada data"),
+                Text((userGet) != null
+                    ? "${userGet?.id} | ${userGet?.name}"
+                    : "Tidak ada data"),
+                SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: (userGet != null)
+                        ? CircleAvatar(
+                            backgroundImage: NetworkImage(userGet!.avatar))
+                        : null),
+                Card(
+                  child: SizedBox(
+                      width: 250,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              controller: nameController,
+                              decoration:
+                                  (const InputDecoration(labelText: 'Nama')),
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: TextField(
-                            controller: jobController,
-                            decoration:
-                                (const InputDecoration(labelText: 'Pekerjaan')),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: TextField(
+                              controller: jobController,
+                              decoration: (const InputDecoration(
+                                  labelText: 'Pekerjaan')),
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: TextField(
-                            controller: idController,
-                            decoration:
-                                (const InputDecoration(labelText: 'id user')),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: TextField(
+                              controller: idController,
+                              decoration:
+                                  (const InputDecoration(labelText: 'id user')),
+                            ),
                           ),
-                        ),
-                      ],
-                    )),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: (() => {
-                          PostResult.postToApi(
-                                  nameController.text, jobController.text)
-                              .then((value) {
-                            setState(() {
-                              postResult = value;
-                            });
+                        ],
+                      )),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      onPressed: (() => {
+                            PostResult.postToApi(
+                                    nameController.text, jobController.text)
+                                .then((value) {
+                              setState(() {
+                                postResult = value;
+                              });
+                            }),
                           }),
-                        }),
-                    child: const Text('Post Me'),
-                  ),
-                  ElevatedButton(
-                    onPressed: (() => {
-                          if (validId.any((value) =>
-                              value.contains(idController.text.trim())))
-                            {showAlertDialog(context)}
-                          else
-                            {
-                              User.getFromAPI(idController.text).then((value) {
-                                setState(() {
-                                  userGet = value;
-                                });
-                              }),
-                            }
-                        }),
-                    child: const Text('Get Me'),
-                  ),
-                ],
-              )
-            ],
+                      child: const Text('Post Me'),
+                    ),
+                    ElevatedButton(
+                      onPressed: (() => {
+                            if (!validId.contains(idController.text))
+                              {
+                                debugPrint(
+                                    idController.text.runtimeType.toString()),
+                                showAlertDialog(context)
+                              }
+                            else
+                              {
+                                User.getFromAPI(idController.text)
+                                    .then((value) {
+                                  setState(() {
+                                    userGet = value;
+                                  });
+                                }),
+                              }
+                          }),
+                      child: const Text('Get Me'),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
-        ),
+        ]),
       ),
     );
   }
