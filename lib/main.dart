@@ -136,8 +136,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   ElevatedButton(
                     onPressed: (() => {
-                          if (validId.any((value) =>
-                              value.contains(idController.text.trim())))
+                          if (!validId.contains(idController.text))
                             {showAlertDialog(context)}
                           else
                             {
