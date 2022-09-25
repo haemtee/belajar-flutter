@@ -42,10 +42,30 @@ showAlertDialog(BuildContext context) {
   );
 }
 
+List<Widget> prepareCardWidgets(List<User> users) {
+  //here you can do any processing you need as long as you return a list of ```Widget```.
+  List<Widget> widgets = [];
+  for (var user in users) {
+    widgets.add(Column(children: [
+      Text(user.name),
+      SizedBox(
+        width: 100,
+        height: 100,
+        child: CircleAvatar(
+          backgroundImage: NetworkImage(user.avatar),
+        ),
+      ),
+    ]));
+  }
+
+  return widgets;
+}
+
 //test fitur git
 class _MyAppState extends State<MyApp> {
   PostResult? postResult;
   User? userGet;
+  List<User>? listUsers = [];
   final TextEditingController nameController = TextEditingController();
   final TextEditingController jobController = TextEditingController();
   final TextEditingController idController = TextEditingController();
@@ -63,6 +83,7 @@ class _MyAppState extends State<MyApp> {
     '11',
     '12'
   ];
+  List<String> validPage = ['1', '2'];
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -88,6 +109,10 @@ class _MyAppState extends State<MyApp> {
                         ? CircleAvatar(
                             backgroundImage: NetworkImage(userGet!.avatar))
                         : null),
+                Column(
+                  children: prepareCardWidgets(listUsers!),
+                ), //
+
                 Card(
                   child: SizedBox(
                       width: 250,
@@ -155,6 +180,21 @@ class _MyAppState extends State<MyApp> {
                               }
                           }),
                       child: const Text('Get Me'),
+                    ),
+                    ElevatedButton(
+                      onPressed: (() => {
+                            if (!validPage.contains(idController.text))
+                              {showAlertDialog(context)}
+                            else
+                              {
+                                User.getUsers(idController.text).then((value) {
+                                  setState(() {
+                                    listUsers = value;
+                                  });
+                                }),
+                              }
+                          }),
+                      child: const Text('Page Me'),
                     ),
                   ],
                 )
