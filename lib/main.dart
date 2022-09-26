@@ -1,65 +1,115 @@
-import 'package:anmovie/application_color.dart';
+// import 'package:anmovie/application_color.dart';
+
+import 'package:anmovie/balance.dart';
+import 'package:anmovie/cart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    MyApp(),
+    const MyApp(),
   );
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
-  bool switched = false;
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ChangeNotifierProvider(
-        create: (context) => ApplicationColor(),
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<Money>(
+            create: (context) => Money(),
+          ),
+          ChangeNotifierProvider<Cart>(
+            create: (context) => Cart(),
+          ),
+        ],
         child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.black45,
-            title: Consumer<ApplicationColor>(
-              builder: (context, applicationColor, _) {
-                return Text(
-                  'Provider State Management',
-                  style: TextStyle(color: applicationColor.color),
-                );
-              },
-            ),
-          ), //
-          body: Center(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Consumer<ApplicationColor>(
-                builder: (context, value, child) {
-                  return AnimatedContainer(
-                    width: 100,
-                    height: 100,
-                    color: value.color,
-                    duration: const Duration(milliseconds: 500),
-                  );
-                },
+          floatingActionButton: Consumer<Money>(
+            builder: (context, money, child) => Consumer<Cart>(
+              builder: (context, cart, child) => FloatingActionButton(
+                onPressed: (() {
+                  if (money.balance >= 500) {
+                    cart.quantity++;
+                    money.balance = money.balance - 500;
+                  }
+                }),
+                child: const Icon(Icons.shopping_cart),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('AB'),
-                  Consumer<ApplicationColor>(
-                      builder: (context, applicationColor, child) {
-                    return Switch(
-                        value: applicationColor.isLightBlue,
-                        onChanged: (newValue) {
-                          applicationColor.isLightBlue = newValue;
-                        });
-                  }),
-                  const Text('LB'),
-                ],
-              )
-            ],
-          )),
+            ),
+          ),
+          appBar: AppBar(
+            title: const Text('Multi Provider State Management'),
+            backgroundColor: Colors.pink.shade300,
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Balance',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: Colors.pink.shade100,
+                          border: Border.all(
+                              color: Colors.pink,
+                              style: BorderStyle.solid,
+                              width: 2)),
+                      width: 100,
+                      height: 30,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Consumer<Money>(
+                          builder: (context, money, child) {
+                            return Text(money.balance.toString(),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold));
+                          },
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                Container(
+                  margin: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(
+                          color: Colors.black,
+                          style: BorderStyle.solid,
+                          width: 2)),
+                  width: 300,
+                  height: 30,
+                  child: Consumer<Cart>(
+                    builder: (context, cart, child) => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Apple 500 x ${cart.quantity}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            (cart.quantity * 500).toString(),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ]),
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );
