@@ -1,116 +1,65 @@
-// import 'package:anmovie/application_color.dart';
-
-import 'package:anmovie/balance.dart';
-import 'package:anmovie/cart.dart';
+import 'package:anmovie/color_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-// import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    const MyApp(),
+    const Myapp(),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Myapp extends StatefulWidget {
+  const Myapp({super.key});
+
+  @override
+  State<Myapp> createState() => _MyappState();
+}
+
+class _MyappState extends State<Myapp> {
+  ColorBloc bloc = ColorBloc();
+  @override
+  void dispose() {
+    bloc.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider<Money>(
-            create: (context) => Money(),
-          ),
-          ChangeNotifierProvider<Cart>(
-            create: (context) => Cart(),
-          ),
-        ],
-        child: Scaffold(
-          floatingActionButton: Consumer<Money>(
-            builder: (context, money, child) => Consumer<Cart>(
-              builder: (context, cart, child) => FloatingActionButton(
-                onPressed: (() {
-                  if (money.balance >= 500) {
-                    cart.quantity++;
-                    money.balance = money.balance - 500;
-                  }
-                }),
-                child: const Icon(Icons.shopping_cart),
-              ),
-            ),
-          ),
-          appBar: AppBar(
-            title: const Text('Multi Provider State Management'),
-            backgroundColor: Colors.pink.shade300,
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Balance',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.all(5),
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.pink.shade100,
-                          border: Border.all(
-                              color: Colors.pink,
-                              style: BorderStyle.solid,
-                              width: 2)),
-                      width: 100,
-                      height: 30,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Consumer<Money>(
-                          builder: (context, money, child) {
-                            return Text(money.balance.toString(),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold));
-                          },
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                Container(
-                  margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                          color: Colors.black,
-                          style: BorderStyle.solid,
-                          width: 2)),
-                  width: 300,
-                  height: 30,
-                  child: Consumer<Cart>(
-                    builder: (context, cart, child) => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Apple 500 x ${cart.quantity}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            (cart.quantity * 500).toString(),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ]),
-                  ),
-                )
-              ],
-            ),
-          ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('BLoC tanpa Library'),
         ),
+        floatingActionButton:
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          FloatingActionButton(
+            onPressed: () {
+              bloc.eventSink.add(ColorEvent.toAmber);
+            },
+            backgroundColor: Colors.amber,
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              bloc.eventSink.add(ColorEvent.toLightBlue);
+            },
+            backgroundColor: Colors.lightBlue,
+          ),
+        ]),
+        body: Center(
+            child: StreamBuilder(
+          stream: bloc.stateStream,
+          initialData: Colors.amber,
+          builder: (context, snapshot) {
+            return AnimatedContainer(
+              color: snapshot.data,
+              duration: const Duration(milliseconds: 1000),
+              width: 100,
+              height: 100,
+            );
+          },
+        )),
       ),
     );
   }
